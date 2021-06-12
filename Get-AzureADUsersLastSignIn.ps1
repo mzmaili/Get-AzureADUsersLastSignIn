@@ -41,6 +41,8 @@ function Connect-AzureDevicelogin {
             Body   = @{
                 resource  = $Resource
                 client_id = $ClientId
+                redirect_uri = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+                scope = "Directory.Read.All,User.Read.All,AuditLog.Read.All"
             }
         }
         $DeviceCodeRequest = Invoke-RestMethod @DeviceCodeRequestParams
@@ -113,10 +115,11 @@ $accesstoken = Connect-AzureDevicelogin
 $AADUsers = @()
 $headers = @{ 
             'Content-Type'  = "application\json"
-            'Authorization' = "Bearer $accesstoken" 
+            'Authorization' = "Bearer $accesstoken"
             }
 
-$GraphLink = "https://graph.microsoft.com/beta/users"
+$GraphLink = "https://graph.microsoft.com/beta/users?$"
+$GraphLink = $GraphLink + "select=id,userPrincipalName,displayName,accountEnabled,onPremisesSyncEnabled,createdDateTime,signInActivity"
 
 do{
     $ADUseresult = Invoke-WebRequest -Headers $Headers -Uri $GraphLink -UseBasicParsing -Method "GET" -ContentType "application/json"
@@ -139,7 +142,7 @@ foreach($ADUser in $AADUsers){
     if ($ADUser.accountEnabled){$ADUserepobj | Add-Member NoteProperty -Name "Account Enabled" -Value $ADUser.accountEnabled}else{$ADUserepobj | Add-Member NoteProperty -Name "Account Enabled" -Value "False"}
     if ($ADUser.onPremisesSyncEnabled){$ADUserepobj | Add-Member NoteProperty -Name "onPremisesSyncEnabled" -Value $ADUser.onPremisesSyncEnabled}else{$ADUserepobj | Add-Member NoteProperty -Name "onPremisesSyncEnabled" -Value "False"}
     $ADUserepobj | Add-Member NoteProperty -Name "Created DateTime (UTC)" -Value $ADUser.createdDateTime
-    $ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value ($ADUser.signInActivity).lastSignInDateTime
+    if (($ADUser.signInActivity).lastSignInDateTime) {$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value ($ADUser.signInActivity).lastSignInDateTime}else{$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value "N/A"}
     $ADUserep += $ADUserepobj
 }
 
