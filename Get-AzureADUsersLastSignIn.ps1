@@ -12,6 +12,11 @@
 .EXAMPLE
     .\Get-AADUserLastSignIn.ps1
       Retrieves all Azure AD users with their last sign in date.
+
+Note:
+    If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
+    - The last successful sign-in of a user took place before April 2020.
+    - The affected user account was never used for a successful sign-in.
         
 #>
 
