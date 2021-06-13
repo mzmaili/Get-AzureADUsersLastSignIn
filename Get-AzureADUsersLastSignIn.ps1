@@ -52,8 +52,6 @@ try {
     }
     $DeviceCodeRequest = Invoke-RestMethod @DeviceCodeRequestParams
  
-    Write-Host $DeviceCodeRequest.message -ForegroundColor Yellow
-
     # Copy device code to clipboard
     $DeviceCode = ($DeviceCodeRequest.message -split "code " | Select-Object -Last 1) -split " to authenticate."
     Set-Clipboard -Value $DeviceCode
