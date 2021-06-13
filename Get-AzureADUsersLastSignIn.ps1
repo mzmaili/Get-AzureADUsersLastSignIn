@@ -39,80 +39,83 @@ function Connect-AzureDevicelogin {
         [Parameter(DontShow)]
         $Timeout = 300
     )
-    try {
-        $DeviceCodeRequestParams = @{
-            Method = 'POST'
-            Uri    = "https://login.microsoftonline.com/$TenantID/oauth2/devicecode"
-            Body   = @{
-                resource  = $Resource
-                client_id = $ClientId
-                redirect_uri = "https://login.microsoftonline.com/common/oauth2/nativeclient"
-                scope = "Directory.Read.All,User.Read.All,AuditLog.Read.All"
-            }
+try {
+    $DeviceCodeRequestParams = @{
+        Method = 'POST'
+        Uri    = "https://login.microsoftonline.com/$TenantID/oauth2/devicecode"
+        Body   = @{
+            resource  = $Resource
+            client_id = $ClientId
+            redirect_uri = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+            scope = "Directory.Read.All,AuditLog.Read.All"
         }
-        $DeviceCodeRequest = Invoke-RestMethod @DeviceCodeRequestParams
-
- 
-        Write-Host $DeviceCodeRequest.message -ForegroundColor Yellow
-
-        #Start-Process "https://microsoft.com/devicelogin"
-        
-        # Copy device code to clipboard
-        $code = ($DeviceCodeRequest.message -split "code " | Select-Object -Last 1) -split " to authenticate."
-        Set-Clipboard -Value $code
-
-        # Open Authentication form window
-        Add-Type -AssemblyName System.Windows.Forms
-        $form = New-Object -TypeName System.Windows.Forms.Form -Property @{ Width = 440; Height = 640 }
-        $web = New-Object -TypeName System.Windows.Forms.WebBrowser -Property @{ Width = 440; Height = 600; Url = "https://www.microsoft.com/devicelogin" }
-        $web.Add_DocumentCompleted($DocComp)
-        $web.DocumentText
-        $form.Controls.Add($web)
-        $form.Add_Shown({ $form.Activate() })
-        $web.ScriptErrorsSuppressed = $true
-        $form.AutoScaleMode = 'Dpi'
-        $form.text = "Graph API Authentication"
-        $form.ShowIcon = $False
-        $form.AutoSizeMode = 'GrowAndShrink'
-        $Form.StartPosition = 'CenterScreen'
-        $form.ShowDialog() | Out-Null
-        
-        $TokenRequestParams = @{
-            Method = 'POST'
-            Uri    = "https://login.microsoftonline.com/$TenantId/oauth2/token"
-            Body   = @{
-                grant_type = "urn:ietf:params:oauth:grant-type:device_code"
-                code       = $DeviceCodeRequest.device_code
-                client_id  = $ClientId
-            }
-        }
-        $TimeoutTimer = [System.Diagnostics.Stopwatch]::StartNew()
-        while ([string]::IsNullOrEmpty($TokenRequest.access_token)) {
-            if ($TimeoutTimer.Elapsed.TotalSeconds -gt $Timeout) {
-                throw 'Login timed out, please try again.'
-            }
-            $TokenRequest = try {
-                Invoke-RestMethod @TokenRequestParams -ErrorAction Stop
-            }
-            catch {
-                $Message = $_.ErrorDetails.Message | ConvertFrom-Json
-                if ($Message.error -ne "authorization_pending") {
-                    throw
-                }
-            }
-            Start-Sleep -Seconds 1
-        }
-        Write-Output $TokenRequest.access_token
     }
-    finally {
-        try {
-            Remove-Item -Path $TempPage.FullName -Force -ErrorAction Stop
-            $TimeoutTimer.Stop()
+    $DeviceCodeRequest = Invoke-RestMethod @DeviceCodeRequestParams
+ 
+    Write-Host $DeviceCodeRequest.message -ForegroundColor Yellow
+
+    # Copy device code to clipboard
+    $DeviceCode = ($DeviceCodeRequest.message -split "code " | Select-Object -Last 1) -split " to authenticate."
+    Set-Clipboard -Value $DeviceCode
+
+    Write-Host ''
+    Write-Host "Device code " -ForegroundColor Yellow -NoNewline
+    Write-Host $DeviceCode -ForegroundColor Green -NoNewline
+    Write-Host "has been copied to the clipboard, please past it into the opened 'Microsoft Graph Authentication' window, complete the signin, and close the window to proceed." -ForegroundColor Yellow
+    Write-Host "Note: If 'Microsoft Graph Authentication' window didn't open,"($DeviceCodeRequest.message -split "To sign in, " | Select-Object -Last 1) -ForegroundColor Yellow
+
+    # Open Authentication form window
+    Add-Type -AssemblyName System.Windows.Forms
+    $form = New-Object -TypeName System.Windows.Forms.Form -Property @{ Width = 440; Height = 640 }
+    $web = New-Object -TypeName System.Windows.Forms.WebBrowser -Property @{ Width = 440; Height = 600; Url = "https://www.microsoft.com/devicelogin" }
+    $web.Add_DocumentCompleted($DocComp)
+    $web.DocumentText
+    $form.Controls.Add($web)
+    $form.Add_Shown({ $form.Activate() })
+    $web.ScriptErrorsSuppressed = $true
+    $form.AutoScaleMode = 'Dpi'
+    $form.text = "Microsoft Graph Authentication"
+    $form.ShowIcon = $False
+    $form.AutoSizeMode = 'GrowAndShrink'
+    $Form.StartPosition = 'CenterScreen'
+    $form.ShowDialog() | Out-Null
+        
+    $TokenRequestParams = @{
+        Method = 'POST'
+        Uri    = "https://login.microsoftonline.com/$TenantId/oauth2/token"
+        Body   = @{
+            grant_type = "urn:ietf:params:oauth:grant-type:device_code"
+            code       = $DeviceCodeRequest.device_code
+            client_id  = $ClientId
+        }
+    }
+    $TimeoutTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    while ([string]::IsNullOrEmpty($TokenRequest.access_token)) {
+        if ($TimeoutTimer.Elapsed.TotalSeconds -gt $Timeout) {
+            throw 'Login timed out, please try again.'
+        }
+        $TokenRequest = try {
+            Invoke-RestMethod @TokenRequestParams -ErrorAction Stop
         }
         catch {
-            # We don't care about errors here
+            $Message = $_.ErrorDetails.Message | ConvertFrom-Json
+            if ($Message.error -ne "authorization_pending") {
+                throw
+            }
         }
+        Start-Sleep -Seconds 1
     }
+    Write-Output $TokenRequest.access_token
+}
+finally {
+    try {
+        Remove-Item -Path $TempPage.FullName -Force -ErrorAction Stop
+        $TimeoutTimer.Stop()
+    }
+    catch {
+        # We don't care about errors here
+    }
+}
 }
 
 $accesstoken = Connect-AzureDevicelogin
@@ -136,7 +139,7 @@ do{
             $AADUsers += $ADUseresult
         }
         $GraphLink = ($ADUseresult).'@odata.nextlink'
-   } until (!($GraphLink)) 
+  } until (!($GraphLink)) 
 
 $ADUserep =@()
 foreach($ADUser in $AADUsers){
