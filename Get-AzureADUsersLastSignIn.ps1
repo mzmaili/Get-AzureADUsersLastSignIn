@@ -14,9 +14,11 @@
       Retrieves all Azure AD users with their last sign in date.
 
 Note:
-    If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
-    - The last successful sign-in of a user took place before April 2020.
-    - The affected user account was never used for a successful sign-in.
+    > Tenet should has an Azure Active Directory Premium.
+    
+    > If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
+        - The last successful sign-in of a user took place before April 2020.
+        - The affected user account was never used for a successful sign-in.
         
 #>
 
@@ -60,7 +62,7 @@ try {
     Write-Host "Device code " -ForegroundColor Yellow -NoNewline
     Write-Host $DeviceCode -ForegroundColor Green -NoNewline
     Write-Host "has been copied to the clipboard, please past it into the opened 'Microsoft Graph Authentication' window, complete the signin, and close the window to proceed." -ForegroundColor Yellow
-    Write-Host "Note: If 'Microsoft Graph Authentication' window didn't open,"($DeviceCodeRequest.message -split "To sign in, " | Select-Object -Last 1) -ForegroundColor Yellow
+    Write-Host "Note: If 'Microsoft Graph Authentication' window didn't open,"($DeviceCodeRequest.message -split "To sign in, " | Select-Object -Last 1) -ForegroundColor gray
 
     # Open Authentication form window
     Add-Type -AssemblyName System.Windows.Forms
@@ -128,7 +130,17 @@ $GraphLink = "https://graph.microsoft.com/beta/users?$"
 $GraphLink = $GraphLink + "select=id,userPrincipalName,displayName,accountEnabled,onPremisesSyncEnabled,createdDateTime,signInActivity"
 
 do{
-    $ADUseresult = Invoke-WebRequest -Headers $Headers -Uri $GraphLink -UseBasicParsing -Method "GET" -ContentType "application/json"
+    try{
+        $ADUseresult = Invoke-WebRequest -Headers $Headers -Uri $GraphLink -UseBasicParsing -Method "GET" -ContentType "application/json"
+    }catch{
+        Write-Host ''
+        Write-Host ''
+        Write-Host "Operation aborted. Please make sure tenant has an Azure Active Directory Premium license." -ForegroundColor red -BackgroundColor Black
+        Write-Host ''
+        Write-Host "Script completed successfully." -ForegroundColor Green -BackgroundColor Black
+        Write-Host ''
+        exit
+    }
     $ADUseresult = $ADUseresult.Content | ConvertFrom-Json
         if ($ADUseresult.value) {
             $AADUsers += $ADUseresult.value
