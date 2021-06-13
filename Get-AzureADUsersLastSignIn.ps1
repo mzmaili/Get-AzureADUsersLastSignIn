@@ -13,7 +13,7 @@
     .\Get-AADUserLastSignIn.ps1
       Retrieves all Azure AD users with their last sign in date.
 
-Note:
+Important Notes:
     > Tenet should has an Azure Active Directory Premium.
     
     > If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
