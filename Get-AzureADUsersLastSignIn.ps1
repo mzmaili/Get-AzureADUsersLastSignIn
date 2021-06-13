@@ -170,9 +170,6 @@ $filerep = "AzureADUsersLastLogin_" + $Date + $Time + ".csv"
 $ADUserep | Export-Csv -path $filerep -NoTypeInformation
 
 ''
-''
-Write-Host "Script completed successfully." -ForegroundColor Green -BackgroundColor Black
-''
 Write-Host "==================================="
 Write-Host "|Retreived Azure AD Users Summary:|"
 Write-Host "==================================="
@@ -181,5 +178,7 @@ Write-Host "Number of retreived AAD Users:" $ADUserep.Count
 $loc=Get-Location
 Write-host $filerep "report has been created under the path:" $loc -ForegroundColor green
 
-
-
+''
+''
+Write-Host "Script completed successfully." -ForegroundColor Green -BackgroundColor Black
+''
