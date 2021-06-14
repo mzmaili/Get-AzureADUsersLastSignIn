@@ -1,10 +1,10 @@
 ﻿<#
 
 .SYNOPSIS
-    Get-AADUserLastSignIn PowerShell script.
+    Get-AzureADUsersLastSignIn PowerShell script.
 
 .DESCRIPTION
-    Get-AADUserLastSignIn.ps1 is a PowerShell script retrieves Azure AD users with their last sign in date.
+    Get-AzureADUsersLastSignIn.ps1 is a PowerShell script retrieves Azure AD users with their last sign in date.
 
 .AUTHOR:
     Mohammad Zmaili
@@ -14,7 +14,7 @@
       Retrieves all Azure AD users with their last sign in date.
 
 Important Notes:
-    > Tenet should has an Azure Active Directory Premium.
+    > Tenant should have an Azure Active Directory Premium.
     
     > If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
         - The last successful sign-in of a user took place before April 2020.
