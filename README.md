@@ -12,8 +12,8 @@ Download and run the `Get-AzureADUsersLastSignIn.ps1` script from [this](https:/
 - To retrieve Azure AD users with their last sign-in details.
 - To generate a CSV report with the result.
 
-## User experiance
-PowerShell consol output:  
+## User experience
+PowerShell console output:  
 ![Alt text](https://github.com/mzmaili/Get-AzureADUsersLastSignIn/blob/main/media/PS.png "PowerShell Output")  
 
 CSV output:  
