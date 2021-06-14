@@ -1,5 +1,5 @@
 # Azure AD Users Last Sign-in Report
-Get-AzureADUsersLastSignIn.ps1 is a PowerShell script retrieves Azure AD users with their last sign in date.
+Coming from the fact that we have a challenge when it comes to getting last sign-in details for Azure AD users as this attribute is not available either in AzureAD or MSOnline modules, Get-AzureADUsersLastSignIn.ps1 PowerShell script resolves this challenge as it retrieves Azure AD users with their last sign in date.
 
 ## Script requirements
 - You need to sign-in using a Global Admin (GA) account.
