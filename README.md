@@ -14,10 +14,10 @@ Download and run the `Get-AzureADUsersLastSignIn.ps1` script from [this](https:/
 
 ## User experiance
 PowerShell consol output:  
-![Alt text](https://github.com/mzmaili/Get-AzureADUsersLastSignIn/blob/master/ps.png "PowerShell Output")  
+![Alt text](https://github.com/mzmaili/Get-AzureADUsersLastSignIn/tree/main/media/PS.png "PowerShell Output")  
 
 CSV output:  
-![Alt text](https://github.com/mzmaili/Get-AzureADUsersLastSignIn/blob/master/csv.png "CSV Output")  
+![Alt text](https://github.com/mzmaili/Get-AzureADUsersLastSignIn/blob/master/media/CSV.png "CSV Output")  
 
 # Frequently asked questions
 ## Does this script change anything?
