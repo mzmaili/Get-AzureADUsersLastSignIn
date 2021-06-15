@@ -58,10 +58,9 @@ try {
     $DeviceCode = ($DeviceCodeRequest.message -split "code " | Select-Object -Last 1) -split " to authenticate."
     Set-Clipboard -Value $DeviceCode
 
-    Write-Host ''
     Write-Host "Device code " -ForegroundColor Yellow -NoNewline
     Write-Host $DeviceCode -ForegroundColor Green -NoNewline
-    Write-Host "has been copied to the clipboard, please past it into the opened 'Microsoft Graph Authentication' window, complete the signin, and close the window to proceed." -ForegroundColor Yellow
+    Write-Host "has been copied to the clipboard, please paste it into the opened 'Microsoft Graph Authentication' window, complete the signin, and close the window to proceed." -ForegroundColor Yellow
     Write-Host "Note: If 'Microsoft Graph Authentication' window didn't open,"($DeviceCodeRequest.message -split "To sign in, " | Select-Object -Last 1) -ForegroundColor gray
 
     # Open Authentication form window
@@ -118,6 +117,12 @@ finally {
 }
 }
 
+''
+'========================================================'
+Write-Host '            Azure AD Users Last SignIn Report          ' -ForegroundColor Green 
+'========================================================'
+''
+
 $accesstoken = Connect-AzureDevicelogin
 
 $AADUsers = @()
@@ -167,7 +172,17 @@ foreach($ADUser in $AADUsers){
 $Date=("{0:s}" -f (get-date)).Split("T")[0] -replace "-", ""
 $Time=("{0:s}" -f (get-date)).Split("T")[1] -replace ":", ""
 $filerep = "AzureADUsersLastLogin_" + $Date + $Time + ".csv"
-$ADUserep | Export-Csv -path $filerep -NoTypeInformation
+try{
+    $ADUserep | Export-Csv -path $filerep -NoTypeInformation
+}catch{
+    Write-Host ''
+    Write-Host ''
+    Write-Host "Operation aborted. Please make sure you have write permission on to write CSV file." -ForegroundColor red -BackgroundColor Black
+    Write-Host ''
+    Write-Host "Script completed successfully." -ForegroundColor Green -BackgroundColor Black
+    Write-Host ''
+    exit
+}
 
 ''
 Write-Host "==================================="
