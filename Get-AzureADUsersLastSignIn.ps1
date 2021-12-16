@@ -49,7 +49,8 @@ try {
             resource  = $Resource
             client_id = $ClientId
             redirect_uri = "https://login.microsoftonline.com/common/oauth2/nativeclient"
-            scope = "Directory.Read.All,AuditLog.Read.All"
+            #scope = "Directory.Read.All,AuditLog.Read.All"
+            scope = "AuditLog.Read.All"
         }
     }
     $DeviceCodeRequest = Invoke-RestMethod @DeviceCodeRequestParams
@@ -140,7 +141,7 @@ do{
     }catch{
         Write-Host ''
         Write-Host ''
-        Write-Host "Operation aborted. Please make sure tenant has an Azure Active Directory Premium license." -ForegroundColor red -BackgroundColor Black
+        Write-Host "Operation aborted. Please make sure that tenant has an Azure Active Directory Premium license, and you have the right permissions." -ForegroundColor red -BackgroundColor Black
         Write-Host ''
         Write-Host "Script completed successfully." -ForegroundColor Green -BackgroundColor Black
         Write-Host ''
