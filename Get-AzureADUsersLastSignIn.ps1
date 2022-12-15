@@ -133,7 +133,7 @@ $headers = @{
             }
 
 $GraphLink = "https://graph.microsoft.com/beta/users?$"
-$GraphLink = $GraphLink + "select=id,userPrincipalName,displayName,accountEnabled,onPremisesSyncEnabled,createdDateTime,signInActivity"
+$GraphLink = $GraphLink + "select=id,userPrincipalName,displayName,accountEnabled,onPremisesSyncEnabled,createdDateTime,signInActivity&`$top=999"
 
 do{
     try{
