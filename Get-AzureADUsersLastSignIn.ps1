@@ -16,10 +16,10 @@
 Important Notes:
     > Tenant should have an Azure Active Directory Premium.
     
-    > If 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
+    > If 'Last Non-Interactive Signin (UTC)' / 'Last Interactive Signin (UTC)' / 'Last Success Signin (UTC)' value is 'N/A', this could be due to one of the following two reasons:
         - The last successful sign-in of a user took place before April 2020.
         - The affected user account was never used for a successful sign-in.
-        
+    > Detail Definition of the date columns can be found here: https://learn.microsoft.com/en-us/graph/api/resources/signinactivity?view=graph-rest-1.0
 #>
 
 function Connect-AzureDevicelogin {
@@ -166,7 +166,9 @@ foreach($ADUser in $AADUsers){
     if ($ADUser.accountEnabled){$ADUserepobj | Add-Member NoteProperty -Name "Account Enabled" -Value $ADUser.accountEnabled}else{$ADUserepobj | Add-Member NoteProperty -Name "Account Enabled" -Value "False"}
     if ($ADUser.onPremisesSyncEnabled){$ADUserepobj | Add-Member NoteProperty -Name "onPremisesSyncEnabled" -Value $ADUser.onPremisesSyncEnabled}else{$ADUserepobj | Add-Member NoteProperty -Name "onPremisesSyncEnabled" -Value "False"}
     $ADUserepobj | Add-Member NoteProperty -Name "Created DateTime (UTC)" -Value $ADUser.createdDateTime
-    if (($ADUser.signInActivity).lastSignInDateTime) {$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value ($ADUser.signInActivity).lastSignInDateTime}else{$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value "N/A"}
+	if (($ADUser.signInActivity).lastNonInteractiveSignInDateTime) {$ADUserepobj | Add-Member NoteProperty -Name "Last Non-Interactive Signin (UTC)" -Value ($ADUser.signInActivity).lastNonInteractiveSignInDateTime}else{$ADUserepobj | Add-Member NoteProperty -Name "Last Non-Interactive Signin (UTC)" -Value "N/A"}
+    if (($ADUser.signInActivity).lastSignInDateTime) {$ADUserepobj | Add-Member NoteProperty -Name "Last Interactive Signin (UTC)" -Value ($ADUser.signInActivity).lastSignInDateTime}else{$ADUserepobj | Add-Member NoteProperty -Name "Last Interactive Signin (UTC)" -Value "N/A"}
+    if (($ADUser.signInActivity).lastSuccessfulSignInDateTime) {$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value ($ADUser.signInActivity).lastSuccessfulSignInDateTime}else{$ADUserepobj | Add-Member NoteProperty -Name "Last Success Signin (UTC)" -Value "N/A"}
     $ADUserep += $ADUserepobj
 }
 
